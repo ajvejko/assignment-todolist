@@ -46,7 +46,7 @@ const closeModal = () => {
     v-if="showTodoEditModal"
     :taskName="name"
     @editTask="editTask"
-    @closeModal="closeModal"
+    @closeModal="closeModal()"
   />
   <div
     v-if="!showTodoEditModal"

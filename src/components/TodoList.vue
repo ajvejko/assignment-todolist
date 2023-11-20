@@ -9,6 +9,7 @@ import IconTrash from "./icons/IconTrash.vue";
 import IconAdd from "./icons/IconAdd.vue";
 import TodoItem from "./TodoItem.vue";
 import TodoAddModal from "./TodoAddModal.vue";
+import ListEditModal from "./ListEditModal.vue";
 
 const emits = defineEmits(["toggleDropdownList", "deleteTodoList"]);
 const props = defineProps({
@@ -20,6 +21,7 @@ const props = defineProps({
 const store = useStore();
 const openDropdownItem = ref<number | null>(null);
 const showTodoAddModal = ref<boolean>(false);
+const showListEditModal = ref<boolean>(false);
 
 const toggleDropdownList = () => {
   emits("toggleDropdownList");
@@ -37,6 +39,10 @@ const closeModal = () => {
   showTodoAddModal.value = false;
 };
 
+const closeEditModal = () => {
+  showListEditModal.value = false;
+};
+
 const addTask = (taskName) => {
   store.commit("addTask", { listId: props.id, taskName });
   localStorage.setItem("todoLists", JSON.stringify(store.state.todoLists));
@@ -46,11 +52,22 @@ const deleteTask = (taskId) => {
   store.commit("deleteTask", { listId: props.id, taskId });
   localStorage.setItem("todoLists", JSON.stringify(store.state.todoLists));
 };
+
+const editList = (listName) => {
+  store.commit("editList", { listId: props.id, listName });
+  localStorage.setItem("todoLists", JSON.stringify(store.state.todoLists));
+};
 </script>
 
 <template>
   <div class="relative divide-y">
-    <div class="mb-2 flex justify-between">
+    <ListEditModal
+      v-if="showListEditModal"
+      :listName="name"
+      @editList="editList"
+      @closeModal="closeEditModal()"
+    />
+    <div v-if="!showListEditModal" class="mb-2 flex justify-between">
       <div class="font-medium text-[#1179d2] lg:text-lg" href="#">
         {{ name }}
       </div>
@@ -79,7 +96,10 @@ const deleteTask = (taskId) => {
             v-if="showDropdownList"
             class="absolute right-6 top-3 z-20 divide-y divide-gray-200 rounded border bg-white shadow-xl"
           >
-            <button class="flex items-center px-4 py-2">
+            <button
+              @click="(showListEditModal = true), toggleDropdownList()"
+              class="flex items-center px-4 py-2"
+            >
               <IconPencilSquare class="mr-2 h-5 w-5 stroke-gray-500 stroke-2" />
               <span class="text-[0.8125rem] font-light"
                 >Edit To-Do list...</span

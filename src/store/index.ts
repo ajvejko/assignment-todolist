@@ -66,5 +66,11 @@ export default createStore<State>({
         }
       }
     },
+    editList(state, { listId, listName }) {
+      const list = state.todoLists.find((list) => list.id === listId);
+      if (list) {
+        list.name = listName;
+      }
+    },
   },
 });
