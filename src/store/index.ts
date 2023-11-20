@@ -57,5 +57,14 @@ export default createStore<State>({
         }
       }
     },
+    editTask(state, { listId, taskId, taskName }) {
+      const list = state.todoLists.find((list) => list.id === listId);
+      if (list) {
+        const task = list.tasks.find((task) => task.id === taskId);
+        if (task) {
+          task.name = taskName;
+        }
+      }
+    },
   },
 });

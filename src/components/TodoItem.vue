@@ -4,15 +4,20 @@ import { useStore } from "vuex";
 import IconDotMenu from "./icons/IconDotMenu.vue";
 import IconPencilSquare from "./icons/IconPencilSquare.vue";
 import IconTrash from "./icons/IconTrash.vue";
-import store from "../store";
+import TodoEditModal from "./TodoEditModal.vue";
 
 const props = defineProps({
   showDropdownItem: Boolean,
+  listId: String,
   name: String,
   id: String,
 });
 
 const emits = defineEmits(["toggleDropdownItem", "deleteTask"]);
+
+const store = useStore();
+const checked = ref<boolean>(false);
+const showTodoEditModal = ref<boolean>(false);
 
 const toggleDropdownItem = () => {
   emits("toggleDropdownItem");
@@ -22,12 +27,31 @@ const deleteTask = () => {
   emits("deleteTask");
 };
 
-const checked = ref(false);
+const editTask = (taskName) => {
+  store.commit("editTask", {
+    listId: props.listId,
+    taskId: props.id,
+    taskName,
+  });
+  localStorage.setItem("todoLists", JSON.stringify(store.state.todoLists));
+};
 
+const closeModal = () => {
+  showTodoEditModal.value = false;
+};
 </script>
 
 <template>
-  <div class="task-row group relative flex justify-between hover:bg-gray-100">
+  <TodoEditModal
+    v-if="showTodoEditModal"
+    :taskName="name"
+    @editTask="editTask"
+    @closeModal="closeModal"
+  />
+  <div
+    v-if="!showTodoEditModal"
+    class="task-row group relative flex justify-between hover:bg-gray-100"
+  >
     <div class="relative mr-2 flex min-w-0 items-center py-1 text-sm">
       <input
         type="checkbox"
@@ -37,7 +61,7 @@ const checked = ref(false);
 
       <label
         class="ml-1 truncate text-[0.8125rem] font-light md:text-base"
-        :class="{ 'line-through text-gray-500': checked }"
+        :class="{ 'text-gray-500 line-through': checked }"
       >
         {{ name }}
       </label>
@@ -52,12 +76,12 @@ const checked = ref(false);
         />
       </button>
 
-      <button @click="deleteTask()" title="Delete">
+      <button @click="deleteTask()" type="button" title="Delete">
         <IconTrash class="mr-2 h-5 w-5 stroke-red-500/80 stroke-2" />
       </button>
     </div>
 
-    <button type="button" class="lg:hidden" @click="toggleDropdownItem">
+    <button @click="toggleDropdownItem()" type="button" class="lg:hidden">
       <IconDotMenu class="h-5 w-5 stroke-gray-500" />
     </button>
 
@@ -67,7 +91,10 @@ const checked = ref(false);
         v-if="showDropdownItem"
         class="absolute right-4 top-3 z-10 divide-y divide-gray-200 rounded border bg-white shadow-xl"
       >
-        <button class="flex items-center px-4 py-2">
+        <button
+          @click="(showTodoEditModal = true), toggleDropdownItem()"
+          class="flex items-center px-4 py-2"
+        >
           <IconPencilSquare class="mr-2 h-5 w-5 stroke-gray-500 stroke-2" />
           <span class="text-[0.8125rem] font-light">Edit task...</span>
         </button>

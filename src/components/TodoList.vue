@@ -10,12 +10,12 @@ import IconAdd from "./icons/IconAdd.vue";
 import TodoItem from "./TodoItem.vue";
 import TodoAddModal from "./TodoAddModal.vue";
 
+const emits = defineEmits(["toggleDropdownList", "deleteTodoList"]);
 const props = defineProps({
   showDropdownList: Boolean,
   name: String,
   id: String,
 });
-const emits = defineEmits(["toggleDropdownList", "deleteTodoList"]);
 
 const store = useStore();
 const openDropdownItem = ref<number | null>(null);
@@ -107,6 +107,7 @@ const deleteTask = (taskId) => {
         :key="task.id"
         :id="task.id"
         :name="task.name"
+        :listId="props.id"
         :showDropdownItem="openDropdownItem === task.id"
         @toggleDropdownItem="toggleDropdownItem(task.id)"
         @deleteTask="deleteTask(task.id)"
