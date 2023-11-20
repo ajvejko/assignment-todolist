@@ -21,17 +21,24 @@ const toggleDropdownItem = () => {
 const deleteTask = () => {
   emits("deleteTask");
 };
+
+const checked = ref(false);
+
 </script>
 
 <template>
   <div class="task-row group relative flex justify-between hover:bg-gray-100">
     <div class="relative mr-2 flex min-w-0 items-center py-1 text-sm">
       <input
-        class="task-checkbox m-1 h-[1.375rem] w-[1.375rem] shrink-0 appearance-none rounded border border-silver bg-white shadow-inner hover:border-blue-400"
         type="checkbox"
+        class="task-checkbox m-1 h-[1.375rem] w-[1.375rem] shrink-0 appearance-none rounded border border-silver bg-white shadow-inner hover:border-blue-400"
+        v-model="checked"
       />
 
-      <label class="ml-1 truncate text-[0.8125rem] font-light md:text-base">
+      <label
+        class="ml-1 truncate text-[0.8125rem] font-light md:text-base"
+        :class="{ 'line-through text-gray-500': checked }"
+      >
         {{ name }}
       </label>
     </div>

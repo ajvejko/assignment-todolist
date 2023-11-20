@@ -3,7 +3,6 @@ import { createStore } from "vuex";
 interface Task {
   id: string;
   name: string;
-  completed: boolean;
 }
 
 interface TodoList {
@@ -44,7 +43,6 @@ export default createStore<State>({
         const newTask = {
           id: `task-${list.tasks.length}`,
           name: taskName,
-          completed: false,
         };
         list.tasks.push(newTask);
       }
