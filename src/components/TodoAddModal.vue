@@ -1,7 +1,12 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
+import store from "../store";
 
 const emits = defineEmits(["closeModal", "addTask"]);
+const props = defineProps({
+  listId: String,
+});
+
 
 const inputRef = ref<HTMLInputElement | null>(null);
 const taskName = ref<string>("");
@@ -11,8 +16,8 @@ const close = () => {
 };
 
 const addTask = () => {
-  emits("addTask", taskName.value);
-  taskName.value = "";
+  store.commit("addTask", { listId: props.listId, taskName: taskName.value });
+  localStorage.setItem("todoLists", JSON.stringify(store.state.todoLists));
   close();
 };
 

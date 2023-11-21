@@ -11,7 +11,7 @@ interface TodoList {
   tasks: Task[];
 }
 
-interface State {
+export interface State {
   todoLists: TodoList[];
   searchInput: string;
 }
@@ -71,7 +71,7 @@ export default createStore<State>({
         }
       }
     },
-    editList(state, payload: { listId: string; listName: string }) {
+    editList(state, payload: { listId: string; listName: string}) {
       const list = state.todoLists.find((list) => list.id === payload.listId);
       if (list) {
         list.name = payload.listName;

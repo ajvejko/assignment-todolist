@@ -1,42 +1,29 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import { useStore } from "vuex";
 import IconDotMenu from "./icons/IconDotMenu.vue";
 import IconPencilSquare from "./icons/IconPencilSquare.vue";
 import IconTrash from "./icons/IconTrash.vue";
 import TodoEditModal from "./TodoEditModal.vue";
+import store from "../store";
 
 const props = defineProps({
-  showDropdownItem: Boolean,
   listId: String,
-  name: String,
-  id: String,
+  taskName: String,
+  taskId: String,
 });
 
-const emits = defineEmits(["toggleDropdownItem", "deleteTask"]);
 
-const store = useStore();
 const checked = ref<boolean>(false);
 const showTodoEditModal = ref<boolean>(false);
-
-const toggleDropdownItem = () => {
-  emits("toggleDropdownItem");
-};
+const showDropdownItem = ref<boolean>(false);
 
 const deleteTask = () => {
-  emits("deleteTask");
-};
-
-const editTask = (taskName) => {
-  store.commit("editTask", {
-    listId: props.listId,
-    taskId: props.id,
-    taskName,
-  });
-  localStorage.setItem("todoLists", JSON.stringify(store.state.todoLists));
+    store.commit("deleteTask", { listId: props.listId, taskId: props.taskId });
+    localStorage.setItem("todoLists", JSON.stringify(store.state.todoLists));
 };
 
 const closeModal = () => {
+  showDropdownItem.value = false;
   showTodoEditModal.value = false;
 };
 </script>
@@ -44,8 +31,9 @@ const closeModal = () => {
 <template>
   <TodoEditModal
     v-if="showTodoEditModal"
-    :taskName="name"
-    @editTask="editTask"
+    :taskName="props.taskName"
+    :taskId="props.taskId"
+    :listId="props.listId"
     @closeModal="closeModal()"
   />
   <div
@@ -63,7 +51,7 @@ const closeModal = () => {
         class="ml-1 truncate text-[0.8125rem] font-light md:text-base"
         :class="{ 'text-gray-500 line-through': checked }"
       >
-        {{ name }}
+        {{ props.taskName }}
       </label>
     </div>
     <!-- On hover options, visible on 1024px media query -->
@@ -81,7 +69,7 @@ const closeModal = () => {
       </button>
     </div>
 
-    <button @click="toggleDropdownItem()" type="button" class="lg:hidden">
+    <button @click="showDropdownItem = !showDropdownItem" type="button" class="lg:hidden">
       <IconDotMenu class="h-5 w-5 stroke-gray-500" />
     </button>
 
@@ -92,7 +80,7 @@ const closeModal = () => {
         class="absolute right-4 top-3 z-10 divide-y divide-gray-200 rounded border bg-white shadow-xl"
       >
         <button
-          @click="(showTodoEditModal = true), toggleDropdownItem()"
+          @click="showTodoEditModal = true"
           class="flex items-center px-4 py-2"
         >
           <IconPencilSquare class="mr-2 h-5 w-5 stroke-gray-500 stroke-2" />

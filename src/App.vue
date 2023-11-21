@@ -1,19 +1,16 @@
 <script setup lang="ts">
-import { onMounted, ref, computed, watch } from "vue";
+import { onMounted, ref, computed } from "vue";
 import { useStore } from "vuex";
+import { State } from "./store";
 import IconAdd from "./components/icons/IconAdd.vue";
 import IconMagnifier from "./components/icons/IconMagnifier.vue";
 import TodoList from "./components/TodoList.vue";
 import ListAddModal from "./components/ListAddModal.vue";
 
-const props = defineProps({
-  showDropdownList: Boolean,
-});
 
-const store = useStore();
+const store = useStore<State>();
 const showListAddModal = ref<boolean>(false);
 const showSearchInput = ref<boolean>(false);
-const openDropdownList = ref<number | null>(null);
 const searchInput = ref<string>("");
 const filteredTodoLists = computed(() => {
   if (!searchInput.value) {
@@ -36,17 +33,9 @@ const addList = (listName: string) => {
   localStorage.setItem("todoLists", JSON.stringify(store.state.todoLists));
 };
 
-const toggleDropdownList = (id: number) => {
-  openDropdownList.value = openDropdownList.value === id ? null : id;
-};
-
-const deleteTodoList = (taskId) => {
-  store.commit("deleteTodoList", taskId);
-  localStorage.setItem("todoLists", JSON.stringify(store.state.todoLists));
-};
 
 onMounted(() => {
-  store.state.todoLists = JSON.parse(localStorage.getItem("todoLists")) || [];
+  store.state.todoLists = JSON.parse(localStorage.getItem("todoLists") || "[]");
 });
 </script>
 
@@ -103,12 +92,9 @@ onMounted(() => {
         <TodoList
           v-for="list in filteredTodoLists"
           :key="list.id"
-          :id="list.id"
+          :listId="list.id"
           :name="list.name"
           :searchedTask="searchInput"
-          :showDropdownList="openDropdownList === list.id"
-          @toggleDropdownList="toggleDropdownList(list.id)"
-          @deleteTodoList="deleteTodoList(list.id)"
         />
       </div>
     </div>

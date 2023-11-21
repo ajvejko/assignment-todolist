@@ -1,21 +1,23 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
+import store from "../store";
 
-const emits = defineEmits(["closeModal", "editList"]);
+const emits = defineEmits(["closeModal"]);
 const props = defineProps({
   listName: String,
+  listId: String,
 });
-
-const inputRef = ref<HTMLInputElement | null>(null);
-const listName = ref<string>(props.listName);
 
 const close = () => {
   emits("closeModal");
 };
 
+const inputRef = ref<HTMLInputElement | null>(null);
+const listName = ref<string | undefined>(props.listName);
+
 const editList = () => {
-  emits("editList", listName.value);
-  listName.value = "";
+  store.commit("editList", { listId: props.listId, listName});
+  localStorage.setItem("todoLists", JSON.stringify(store.state.todoLists));
   close();
 };
 
