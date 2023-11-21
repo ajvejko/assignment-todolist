@@ -12,14 +12,13 @@ const props = defineProps({
   taskId: String,
 });
 
-
 const checked = ref<boolean>(false);
 const showTodoEditModal = ref<boolean>(false);
 const showDropdownItem = ref<boolean>(false);
 
 const deleteTask = () => {
-    store.commit("deleteTask", { listId: props.listId, taskId: props.taskId });
-    localStorage.setItem("todoLists", JSON.stringify(store.state.todoLists));
+  store.commit("deleteTask", { listId: props.listId, taskId: props.taskId });
+  localStorage.setItem("todoLists", JSON.stringify(store.state.todoLists));
 };
 
 const closeModal = () => {
@@ -58,7 +57,7 @@ const closeModal = () => {
     <div
       class="z-10 hidden flex-grow items-center justify-between lg:group-hover:flex"
     >
-      <button title="Edit">
+      <button @click="showTodoEditModal = true" type="button" title="Edit">
         <IconPencilSquare
           class="mr-2 h-5 w-5 stroke-gray-500/90 hover:stroke-blue-500/90"
         />
@@ -69,7 +68,11 @@ const closeModal = () => {
       </button>
     </div>
 
-    <button @click="showDropdownItem = !showDropdownItem" type="button" class="lg:hidden">
+    <button
+      @click="showDropdownItem = !showDropdownItem"
+      type="button"
+      class="lg:hidden"
+    >
       <IconDotMenu class="h-5 w-5 stroke-gray-500" />
     </button>
 
