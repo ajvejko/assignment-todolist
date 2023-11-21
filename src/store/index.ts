@@ -22,7 +22,7 @@ export default createStore<State>({
     searchInput: "",
   },
   mutations: {
-    addTodoList(state, listName) {
+    addTodoList(state, listName: string) {
       const newList = {
         id: `list-${Date.now()}`,
         name: listName,
@@ -31,7 +31,7 @@ export default createStore<State>({
       state.todoLists.push(newList);
     },
 
-    deleteTodoList(state, listId) {
+    deleteTodoList(state, listId: string) {
       const list = state.todoLists.find((list) => list.id === listId);
       if (list) {
         const index = state.todoLists.indexOf(list);
@@ -39,39 +39,42 @@ export default createStore<State>({
       }
     },
 
-    addTask(state, { listId, taskName }) {
-      const list = state.todoLists.find((list) => list.id === listId);
+    addTask(state, payload: { listId: string; taskName: string }) {
+      const list = state.todoLists.find((list) => list.id === payload.listId);
       if (list) {
         const newTask = {
           id: `task-${Date.now()}`,
-          name: taskName,
+          name: payload.taskName,
         };
         list.tasks.push(newTask);
       }
     },
-    deleteTask(state, { listId, taskId }) {
-      const list = state.todoLists.find((list) => list.id === listId);
+    deleteTask(state, payload: { listId: string; taskId: string }) {
+      const list = state.todoLists.find((list) => list.id === payload.listId);
       if (list) {
-        const task = list.tasks.find((task) => task.id === taskId);
+        const task = list.tasks.find((task) => task.id === payload.taskId);
         if (task) {
           const index = list.tasks.indexOf(task);
           list.tasks.splice(index, 1);
         }
       }
     },
-    editTask(state, { listId, taskId, taskName }) {
-      const list = state.todoLists.find((list) => list.id === listId);
+    editTask(
+      state,
+      payload: { listId: string; taskId: string; taskName: string },
+    ) {
+      const list = state.todoLists.find((list) => list.id === payload.listId);
       if (list) {
-        const task = list.tasks.find((task) => task.id === taskId);
+        const task = list.tasks.find((task) => task.id === payload.taskId);
         if (task) {
-          task.name = taskName;
+          task.name = payload.taskName;
         }
       }
     },
-    editList(state, { listId, listName }) {
-      const list = state.todoLists.find((list) => list.id === listId);
+    editList(state, payload: { listId: string; listName: string }) {
+      const list = state.todoLists.find((list) => list.id === payload.listId);
       if (list) {
-        list.name = listName;
+        list.name = payload.listName;
       }
     },
   },
