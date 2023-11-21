@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { useStore } from "vuex";
 import IconDotMenu from "./icons/IconDotMenu.vue";
 import IconMoney from "./icons/IconMoney.vue";
@@ -14,6 +14,7 @@ import ListEditModal from "./ListEditModal.vue";
 const emits = defineEmits(["toggleDropdownList", "deleteTodoList"]);
 const props = defineProps({
   showDropdownList: Boolean,
+  searchedTask: String,
   name: String,
   id: String,
 });
@@ -22,6 +23,17 @@ const store = useStore();
 const openDropdownItem = ref<number | null>(null);
 const showTodoAddModal = ref<boolean>(false);
 const showListEditModal = ref<boolean>(false);
+const filteredTasks = computed(() => {
+  if (!props.searchedTask) {
+    return store.state.todoLists.find((list) => list.id === props.id).tasks;
+  }
+
+  return store.state.todoLists
+    .find((list) => list.id === props.id)
+    .tasks.filter((task) => {
+      return task.name.toLowerCase().includes(props.searchedTask.toLowerCase());
+    });
+});
 
 const toggleDropdownList = () => {
   emits("toggleDropdownList");
@@ -121,9 +133,7 @@ const editList = (listName) => {
 
     <div class="divide-y">
       <TodoItem
-        v-for="task in store.state.todoLists.find(
-          (list) => list.id === props.id,
-        ).tasks"
+        v-for="task in filteredTasks"
         :key="task.id"
         :id="task.id"
         :name="task.name"

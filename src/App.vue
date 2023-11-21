@@ -45,14 +45,6 @@ const deleteTodoList = (taskId) => {
   localStorage.setItem("todoLists", JSON.stringify(store.state.todoLists));
 };
 
-watch(filteredTodoLists, (newVal) => {
-  console.log(newVal);
-});
-
-watch(searchInput, (newVal) => {
-  console.log(newVal);
-});
-
 onMounted(() => {
   store.state.todoLists = JSON.parse(localStorage.getItem("todoLists")) || [];
 });
@@ -114,6 +106,7 @@ onMounted(() => {
           :key="list.id"
           :id="list.id"
           :name="list.name"
+          :searchedTask="searchInput"
           :showDropdownList="openDropdownList === list.id"
           @toggleDropdownList="toggleDropdownList(list.id)"
           @deleteTodoList="deleteTodoList(list.id)"
