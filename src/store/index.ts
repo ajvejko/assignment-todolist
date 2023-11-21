@@ -13,16 +13,18 @@ interface TodoList {
 
 interface State {
   todoLists: TodoList[];
+  searchInput: string;
 }
 
 export default createStore<State>({
   state: {
     todoLists: [],
+    searchInput: "",
   },
   mutations: {
     addTodoList(state, listName) {
       const newList = {
-        id: `list-${state.todoLists.length}`,
+        id: `list-${Date.now()}`,
         name: listName,
         tasks: [],
       };
@@ -41,7 +43,7 @@ export default createStore<State>({
       const list = state.todoLists.find((list) => list.id === listId);
       if (list) {
         const newTask = {
-          id: `task-${list.tasks.length}`,
+          id: `task-${Date.now()}`,
           name: taskName,
         };
         list.tasks.push(newTask);
