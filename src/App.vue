@@ -56,7 +56,7 @@ onMounted(() => {
       class="mx-auto min-h-screen max-w-3xl rounded-md bg-white px-4 py-3 shadow-lg md:h-fit lg:max-w-5xl xl:max-w-7xl"
     >
       <div class="flex items-center justify-between">
-        <div class="flex items-center">
+        <div class="mr-2 flex flex-none items-center">
           <div class="mr-2 text-xl text-red-700 lg:text-2xl">Tasks</div>
           <button
             type="button"
@@ -79,15 +79,14 @@ onMounted(() => {
             v-model="searchInput"
             v-if="showSearchInput"
             placeholder="Search tasks..."
-            class="mr-2 rounded border border-silver bg-[#F5F5F5] p-1 text-sm outline-none focus:border-blue-400 focus:shadow-[0px_0px_4px_rgb(37,99,235)] focus:shadow-sky-300"
+            class="mr-2 w-full rounded border border-silver bg-[#F5F5F5] p-1 text-sm outline-none focus:border-blue-400 focus:shadow-[0px_0px_4px_rgb(37,99,235)] focus:shadow-sky-300"
           />
           <button
-            @click="
-              (showSearchInput = !showSearchInput),
-                (store.state.searchInput = '')
-            "
+            @click="(showSearchInput = !showSearchInput), (searchInput = '')"
             class="rounded border border-silver bg-[#F5F5F5] p-1.5"
-            :class="{ 'bg-[#E6E6E6]': showSearchInput }"
+            :class="{
+              'shadow-[inset_0_0px_20px_rgba(0,0,0,0.4)]': showSearchInput,
+            }"
           >
             <IconMagnifier class="h-4 w-4" />
           </button>
