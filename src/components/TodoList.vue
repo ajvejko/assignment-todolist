@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref } from "vue";
 import { useStore } from "vuex";
-import { State } from "../store";
 import IconDotMenu from "./icons/IconDotMenu.vue";
 import IconMoney from "./icons/IconMoney.vue";
 import IconClock from "./icons/IconClock.vue";
@@ -10,58 +9,48 @@ import IconTrash from "./icons/IconTrash.vue";
 import IconAdd from "./icons/IconAdd.vue";
 import TodoItem from "./TodoItem.vue";
 import TodoAddModal from "./TodoAddModal.vue";
-import ListEditModal from "./ListEditModal.vue";
 
-const emits = defineEmits(["deleteTodoList"]);
 const props = defineProps({
-  searchedTask: String,
+  showDropdownList: Boolean,
   name: String,
-  listId: String,
+  id: String,
 });
+const emits = defineEmits(["toggleDropdownList", "deleteTodoList"]);
 
-const store = useStore<State>();
-const showDropdownList = ref<boolean>(false);
+const store = useStore();
+const openDropdownItem = ref<number | null>(null);
 const showTodoAddModal = ref<boolean>(false);
-const showListEditModal = ref<boolean>(false);
-const filteredTasks = computed(() => {
-  const list = store.state.todoLists.find((list) => list.id === props.listId);
-  if (!list) {
-    return [];
-  }
 
-  if (!props.searchedTask) {
-    return list.tasks;
-  }
-
-  return list.tasks.filter((task) => {
-    return props.searchedTask && task.name.toLowerCase().includes(props.searchedTask.toLowerCase());
-  });
-});
+const toggleDropdownList = () => {
+  emits("toggleDropdownList");
+};
 
 const deleteTodoList = () => {
-  store.commit("deleteTodoList", props.listId);
-  localStorage.setItem("todoLists", JSON.stringify(store.state.todoLists));
+  emits("deleteTodoList");
+};
+
+const toggleDropdownItem = (id: number) => {
+  openDropdownItem.value = openDropdownItem.value === id ? null : id;
 };
 
 const closeModal = () => {
   showTodoAddModal.value = false;
 };
 
-const closeEditModal = () => {
-  showDropdownList.value = false;
-  showListEditModal.value = false;
+const addTask = (taskName) => {
+  store.commit("addTask", { listId: props.id, taskName });
+  localStorage.setItem("todoLists", JSON.stringify(store.state.todoLists));
+};
+
+const deleteTask = (taskId) => {
+  store.commit("deleteTask", { listId: props.id, taskId });
+  localStorage.setItem("todoLists", JSON.stringify(store.state.todoLists));
 };
 </script>
 
 <template>
   <div class="relative divide-y">
-    <ListEditModal
-      v-if="showListEditModal"
-      :listName="props.name"
-      :listId="props.listId"
-      @closeModal="closeEditModal()"
-    />
-    <div v-if="!showListEditModal" class="mb-2 flex justify-between">
+    <div class="mb-2 flex justify-between">
       <div class="font-medium text-[#1179d2] lg:text-lg" href="#">
         {{ name }}
       </div>
@@ -80,7 +69,7 @@ const closeEditModal = () => {
           </span>
         </a>
 
-        <button type="button" @click="showDropdownList = !showDropdownList">
+        <button type="button" @click="toggleDropdownList">
           <IconDotMenu class="h-5 w-5 stroke-gray-500" />
         </button>
 
@@ -88,12 +77,9 @@ const closeEditModal = () => {
         <Transition name="dropdown">
           <div
             v-if="showDropdownList"
-            class="absolute right-4 top-2 z-20 divide-y divide-gray-200 rounded border bg-white shadow-xl"
+            class="absolute right-6 top-3 z-20 divide-y divide-gray-200 rounded border bg-white shadow-xl"
           >
-            <button
-              @click="showListEditModal = true"
-              class="flex items-center px-4 py-2"
-            >
+            <button class="flex items-center px-4 py-2">
               <IconPencilSquare class="mr-2 h-5 w-5 stroke-gray-500 stroke-2" />
               <span class="text-[0.8125rem] font-light"
                 >Edit To-Do list...</span
@@ -115,21 +101,23 @@ const closeEditModal = () => {
 
     <div class="divide-y">
       <TodoItem
-        v-for="task in filteredTasks"
+        v-for="task in store.state.todoLists.find(
+          (list) => list.id === props.id,
+        ).tasks"
         :key="task.id"
-        :taskId="task.id"
-        :taskName="task.name"
-        :listId="props.listId"
-    
+        :id="task.id"
+        :name="task.name"
+        :showDropdownItem="openDropdownItem === task.id"
+        @toggleDropdownItem="toggleDropdownItem(task.id)"
+        @deleteTask="deleteTask(task.id)"
       />
     </div>
     <div>
       <Transition name="fade">
         <TodoAddModal
           v-if="showTodoAddModal"
-          :listId="props.listId"
           @closeModal="closeModal()"
-
+          @addTask="addTask"
         />
       </Transition>
       <button

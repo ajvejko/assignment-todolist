@@ -3,6 +3,7 @@ import { createStore } from "vuex";
 interface Task {
   id: string;
   name: string;
+  completed: boolean;
 }
 
 interface TodoList {
@@ -11,27 +12,25 @@ interface TodoList {
   tasks: Task[];
 }
 
-export interface State {
+interface State {
   todoLists: TodoList[];
-  searchInput: string;
 }
 
 export default createStore<State>({
   state: {
     todoLists: [],
-    searchInput: "",
   },
   mutations: {
-    addTodoList(state, listName: string) {
+    addTodoList(state, listName) {
       const newList = {
-        id: `list-${Date.now()}`,
+        id: `list-${state.todoLists.length}`,
         name: listName,
         tasks: [],
       };
       state.todoLists.push(newList);
     },
 
-    deleteTodoList(state, listId: string) {
+    deleteTodoList(state, listId) {
       const list = state.todoLists.find((list) => list.id === listId);
       if (list) {
         const index = state.todoLists.indexOf(list);
@@ -39,42 +38,25 @@ export default createStore<State>({
       }
     },
 
-    addTask(state, payload: { listId: string; taskName: string }) {
-      const list = state.todoLists.find((list) => list.id === payload.listId);
+    addTask(state, { listId, taskName }) {
+      const list = state.todoLists.find((list) => list.id === listId);
       if (list) {
         const newTask = {
-          id: `task-${Date.now()}`,
-          name: payload.taskName,
+          id: `task-${list.tasks.length}`,
+          name: taskName,
+          completed: false,
         };
         list.tasks.push(newTask);
       }
     },
-    deleteTask(state, payload: { listId: string; taskId: string }) {
-      const list = state.todoLists.find((list) => list.id === payload.listId);
+    deleteTask(state, { listId, taskId }) {
+      const list = state.todoLists.find((list) => list.id === listId);
       if (list) {
-        const task = list.tasks.find((task) => task.id === payload.taskId);
+        const task = list.tasks.find((task) => task.id === taskId);
         if (task) {
           const index = list.tasks.indexOf(task);
           list.tasks.splice(index, 1);
         }
-      }
-    },
-    editTask(
-      state,
-      payload: { listId: string; taskId: string; taskName: string },
-    ) {
-      const list = state.todoLists.find((list) => list.id === payload.listId);
-      if (list) {
-        const task = list.tasks.find((task) => task.id === payload.taskId);
-        if (task) {
-          task.name = payload.taskName;
-        }
-      }
-    },
-    editList(state, payload: { listId: string; listName: string}) {
-      const list = state.todoLists.find((list) => list.id === payload.listId);
-      if (list) {
-        list.name = payload.listName;
       }
     },
   },

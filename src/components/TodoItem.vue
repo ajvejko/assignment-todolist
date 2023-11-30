@@ -1,78 +1,56 @@
 <script setup lang="ts">
 import { ref } from "vue";
+import { useStore } from "vuex";
 import IconDotMenu from "./icons/IconDotMenu.vue";
 import IconPencilSquare from "./icons/IconPencilSquare.vue";
 import IconTrash from "./icons/IconTrash.vue";
-import TodoEditModal from "./TodoEditModal.vue";
 import store from "../store";
 
 const props = defineProps({
-  listId: String,
-  taskName: String,
-  taskId: String,
+  showDropdownItem: Boolean,
+  name: String,
+  id: String,
 });
 
-const checked = ref<boolean>(false);
-const showTodoEditModal = ref<boolean>(false);
-const showDropdownItem = ref<boolean>(false);
+const emits = defineEmits(["toggleDropdownItem", "deleteTask"]);
 
-const deleteTask = () => {
-  store.commit("deleteTask", { listId: props.listId, taskId: props.taskId });
-  localStorage.setItem("todoLists", JSON.stringify(store.state.todoLists));
+const toggleDropdownItem = () => {
+  emits("toggleDropdownItem");
 };
 
-const closeModal = () => {
-  showDropdownItem.value = false;
-  showTodoEditModal.value = false;
+const deleteTask = () => {
+  emits("deleteTask");
 };
 </script>
 
 <template>
-  <TodoEditModal
-    v-if="showTodoEditModal"
-    :taskName="props.taskName"
-    :taskId="props.taskId"
-    :listId="props.listId"
-    @closeModal="closeModal()"
-  />
-  <div
-    v-if="!showTodoEditModal"
-    class="task-row group relative flex justify-between hover:bg-gray-100"
-  >
+  <div class="task-row group relative flex justify-between hover:bg-gray-100">
     <div class="relative mr-2 flex min-w-0 items-center py-1 text-sm">
       <input
-        type="checkbox"
         class="task-checkbox m-1 h-[1.375rem] w-[1.375rem] shrink-0 appearance-none rounded border border-silver bg-white shadow-inner hover:border-blue-400"
-        v-model="checked"
+        type="checkbox"
       />
 
-      <label
-        class="ml-1 truncate text-[0.8125rem] font-light md:text-base"
-        :class="{ 'text-gray-500 line-through': checked }"
-      >
-        {{ props.taskName }}
+      <label class="ml-1 truncate text-[0.8125rem] font-light md:text-base">
+        {{ name }}
       </label>
     </div>
     <!-- On hover options, visible on 1024px media query -->
     <div
       class="z-10 hidden flex-grow items-center justify-between lg:group-hover:flex"
     >
-      <button @click="showTodoEditModal = true" type="button" title="Edit">
+      <button title="Edit">
         <IconPencilSquare
           class="mr-2 h-5 w-5 stroke-gray-500/90 hover:stroke-blue-500/90"
         />
       </button>
 
-      <button @click="deleteTask()" type="button" title="Delete">
+      <button @click="deleteTask()" title="Delete">
         <IconTrash class="mr-2 h-5 w-5 stroke-red-500/80 stroke-2" />
       </button>
     </div>
 
-    <button
-      @click="showDropdownItem = !showDropdownItem"
-      type="button"
-      class="lg:hidden"
-    >
+    <button type="button" class="lg:hidden" @click="toggleDropdownItem">
       <IconDotMenu class="h-5 w-5 stroke-gray-500" />
     </button>
 
@@ -82,10 +60,7 @@ const closeModal = () => {
         v-if="showDropdownItem"
         class="absolute right-4 top-3 z-10 divide-y divide-gray-200 rounded border bg-white shadow-xl"
       >
-        <button
-          @click="showTodoEditModal = true"
-          class="flex items-center px-4 py-2"
-        >
+        <button class="flex items-center px-4 py-2">
           <IconPencilSquare class="mr-2 h-5 w-5 stroke-gray-500 stroke-2" />
           <span class="text-[0.8125rem] font-light">Edit task...</span>
         </button>

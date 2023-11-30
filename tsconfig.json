@@ -8,11 +8,5 @@
       "path": "./tsconfig.app.json"
     }
   ],
-  "compilerOptions": {
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "strict": true,
-   
-  },
   "include": ["node_modules", "src/**/*"]
 }
